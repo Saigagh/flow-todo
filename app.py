@@ -5,6 +5,40 @@ from datetime import datetime
 import sqlite3
 
 
+class Database:
+    def ConnectToDatabase():
+        try:
+            db = sqlite3.connect("todo.db")
+            c = db.cursor()
+            c.execute(
+                "CREATE TABLE if not exists tasks (id INTEGER PRIMARY KEY, Task VARCHAR(255) NOT NULL, Date VARCHAR(255) NOT NULL)"
+            )
+            return db
+        except Exception as e:
+            print(e)
+
+    def ReadDatabase(db):
+        c = db.cursor()
+        c.execute("SELECT Task, Date FROM tasks")
+        records = c.fetchall()
+        return records
+
+    def InsertDatabase(db, values):
+        c = db.cursor()
+        c.execute("INSERT INTO tasks (Task, Date) VALUES (?,?)", values)
+        db.commit()
+
+    def DeleteDatabase(db, values):
+        c = db.cursor()
+        c.execute("DELETE FROM tasks WHERE Task=?", values)
+        db.commit()
+
+    def UpdateDatabase(db, values):
+        c = db.cursor()
+        c.execute("UPDATE tasks SET Task=? WHERE Task=?", values)
+        db.commit()
+
+
 class FormContainer(UserControl):
     def __init__(self, func):
         self.func = func
@@ -132,6 +166,11 @@ def main(page: Page):
     def AddTaskToScreen(e):
         # get current date
         dateTime = datetime.now().strftime("%b, %d, %Y  %I:%M")
+
+        db = Database.ConnectToDatabase()  # returns the db
+        Database.InsertDatabase(db, (form.content.controls[0].value, dateTime))
+        db.close()
+
         # check if there's any content in the textfield
         if form.content.controls[0].value:
             _main_column_.controls.append(
@@ -144,8 +183,18 @@ def main(page: Page):
             )
             _main_column_.update()
             CreateToDoTask(e)
+        else:
+            db.close()
+            pass
 
     def DeleteFunction(e):
+
+        db = Database.ConnectToDatabase()
+        Database.DeleteDatabase(
+            db, (e.controls[0].content.controls[0].controls[0].value,)
+        )
+        db.close()
+
         _main_column_.controls.remove(e)
         _main_column_.update()
 
@@ -163,7 +212,14 @@ def main(page: Page):
         form.update()
 
     def FinalizeUpdate(e):
-        e.controls[0].content.controls[0].controls[0].valueS = form.content.controls[
+        db = Database.ConnectToDatabase()
+        Database.UpdateDatabase(db, (
+            form.content.controls[0].value,
+            e.controls[0].content.controls[0].controls[0].value,
+            ),
+        )
+
+        e.controls[0].content.controls[0].controls[0].value = form.content.controls[
             0
         ].value
         e.controls[0].content.update()
@@ -194,7 +250,7 @@ def main(page: Page):
                     # title row
                     Text("Список задач", size=18, weight="bold"),
                     IconButton(
-                        Icons.ADD_CIRCLE_ROUNDED,
+                        icons.ADD_CIRCLE_ROUNDED,
                         icon_size=18,
                         on_click=lambda e: CreateToDoTask(e),
                     ),
@@ -244,6 +300,18 @@ def main(page: Page):
     page.update()
 
     form = page.controls[0].content.controls[0].content.controls[1].controls[0]
+
+    db = Database.ConnectToDatabase()
+    for task in Database.ReadDatabase(db)[::-1]:  # [::-1] - reverse order
+        _main_column_.controls.append(
+            CreateTask(
+                task[0],
+                task[1],
+                DeleteFunction,
+                UpdateFunction,
+            )
+        )
+    _main_column_.update()
 
 
 if __name__ == "__main__":
