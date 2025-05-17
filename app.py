@@ -46,21 +46,22 @@ class FormContainer(UserControl):
 
     def build(self):
         return Container(
-            width=280,
+            width=314,
             height=80,
-            bgcolor="bluegrey500",
+            bgcolor="white",
             opacity=0,
             border_radius=20,
             margin=margin.only(left=-20, right=-20),
             animate=animation.Animation(400, "decelerate"),
             animate_opacity=200,
-            padding=padding.only(top=45, bottom=45),
+            padding=padding.only(top=25, bottom=50),
+            
             content=Column(
                 horizontal_alignment=CrossAxisAlignment.CENTER,
                 controls=[
                     TextField(
-                        height=48,
-                        width=255,
+                        height=44,
+                        width=276,
                         filled=True,
                         text_size=12,
                         color="black",
@@ -70,7 +71,7 @@ class FormContainer(UserControl):
                     ),
                     IconButton(
                         content=Text("Добавить задачу", color="white"),
-                        width=180,
+                        width=276,
                         height=44,
                         on_click=self.func,  # pass function here
                         style=ButtonStyle(
@@ -123,13 +124,13 @@ class CreateTask(UserControl):
 
     def build(self):
         return Container(
-            width=255,
+            width=276,
             height=60,
-            border=border.all(0.85, "black54"),
-            border_radius=8,
+            bgcolor="white",
+            border_radius=12,
             on_hover=lambda e: self.ShowIcons(e),
             clip_behavior=ClipBehavior.HARD_EDGE,
-            padding=10,
+            padding=15,
             content=Row(
                 alignment=MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
@@ -137,8 +138,8 @@ class CreateTask(UserControl):
                         spacing=1,
                         alignment=MainAxisAlignment.CENTER,
                         controls=[
-                            Text(value=self.task, size=10, weight="Bold"),
-                            Text(value=self.date, size=9, color="black54"),
+                            Text(value=self.task, size=12, weight="bold"),
+                            Text(value=self.date, size=9, weight="bold", color="black54"),
                         ],
                     ),
                     # Icons Delete and Edit
@@ -206,16 +207,18 @@ def main(page: Page):
             form.content.controls[1].on_click,
         ) = (
             e.controls[0].content.controls[0].controls[0].value,
-            "Update",
+            "Отредактировать",
             lambda _: FinalizeUpdate(e),
         )
         form.update()
 
     def FinalizeUpdate(e):
         db = Database.ConnectToDatabase()
-        Database.UpdateDatabase(db, (
-            form.content.controls[0].value,
-            e.controls[0].content.controls[0].controls[0].value,
+        Database.UpdateDatabase(
+            db,
+            (
+                form.content.controls[0].value,
+                e.controls[0].content.controls[0].controls[0].value,
             ),
         )
 
@@ -239,6 +242,7 @@ def main(page: Page):
             form.content.controls[1].on_click = lambda e: AddTaskToScreen(e)
             form.update()
 
+
     _main_column_ = Column(
         scroll="hidden",
         expand=True,
@@ -248,26 +252,25 @@ def main(page: Page):
                 alignment=MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
                     # title row
-                    Text("Список задач", size=18, weight="bold"),
+                    Text("Все задачи", size=32, weight="bold"),
                     IconButton(
                         icons.ADD_CIRCLE_ROUNDED,
-                        icon_size=18,
+                        icon_size=32,
+                        icon_color="black",
                         on_click=lambda e: CreateToDoTask(e),
                     ),
                 ],
             ),
-            Divider(height=8, color="grey"),
         ],
     )
 
-    # set up mobile UI
     page.add(
         # window BG container
         Container(
             width=1500,
             height=800,
             margin=-10,
-            bgcolor="bluegrey900",
+            bgcolor="#FFFFFF",
             alignment=alignment.center,
             content=Row(
                 alignment=MainAxisAlignment.CENTER,
@@ -275,11 +278,14 @@ def main(page: Page):
                 controls=[
                     # main container
                     Container(
-                        width=280,
-                        height=600,
-                        bgcolor="white",
-                        border_radius=20,
-                        border=border.all(0.7, "black"),
+                        width=314,
+                        height=681,
+                        image=flet.DecorationImage(
+                            src="src/background.jpg",
+                            fit=flet.ImageFit.COVER,
+                        ),
+                        border_radius=33,
+                        border=border.all(6.4, "black"),
                         padding=padding.only(top=35, left=20, right=20),
                         clip_behavior=ClipBehavior.HARD_EDGE,
                         content=Column(
@@ -315,4 +321,4 @@ def main(page: Page):
 
 
 if __name__ == "__main__":
-    flet.app(target=main)
+    flet.app(target=main, assets_dir="assets")
