@@ -1,6 +1,7 @@
-from flet import *
+import flet as ft
 
-class CreateTask(UserControl):
+
+class CreateTask(ft.UserControl):
     def __init__(self, task: str, date: str, func1, func2):
         self.task = task
         self.date = date
@@ -9,7 +10,7 @@ class CreateTask(UserControl):
         super().__init__()
 
     def TaskDeleteEdit(self, name, color, func):
-        return IconButton(
+        return ft.IconButton(
             icon=name,
             width=30,
             icon_size=18,
@@ -33,31 +34,48 @@ class CreateTask(UserControl):
         e.control.content.update()
 
     def build(self):
-        return Container(
+        return ft.Container(
             width=276,
             height=60,
             bgcolor="white",
             border_radius=12,
             on_hover=lambda e: self.ShowIcons(e),
-            clip_behavior=ClipBehavior.HARD_EDGE,
+            clip_behavior=ft.ClipBehavior.HARD_EDGE,
             padding=15,
-            content=Row(
-                alignment=MainAxisAlignment.SPACE_BETWEEN,
+            content=ft.Row(
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
-                    Column(
+                    ft.Column(
                         spacing=1,
-                        alignment=MainAxisAlignment.CENTER,
+                        alignment=ft.MainAxisAlignment.CENTER,
                         controls=[
-                            Text(value=self.task, size=12, weight="bold"),
-                            Text(value=self.date, size=9, weight="bold", color="black54"),
+                            ft.Text(
+                                value=self.task,
+                                size=12,
+                                weight="bold",
+                            ),
+                            ft.Text(
+                                value=self.date,
+                                size=9,
+                                weight="bold",
+                                color="black54",
+                            ),
                         ],
                     ),
-                    Row(
+                    ft.Row(
                         spacing=0,
-                        alignment=MainAxisAlignment.CENTER,
+                        alignment=ft.MainAxisAlignment.CENTER,
                         controls=[
-                            self.TaskDeleteEdit(icons.DELETE_ROUNDED, "red500", self.func1),
-                            self.TaskDeleteEdit(icons.EDIT_ROUNDED, "black54", self.func2),
+                            self.TaskDeleteEdit(
+                                ft.icons.DELETE_ROUNDED,
+                                "red500",
+                                self.func1,
+                            ),
+                            self.TaskDeleteEdit(
+                                ft.icons.EDIT_ROUNDED,
+                                "black54",
+                                self.func2,
+                            ),
                         ],
                     ),
                 ],
